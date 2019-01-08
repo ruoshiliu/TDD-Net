@@ -87,3 +87,11 @@ def resnet34( **kwargs):
     """
     model = ResNetEmbedding(BasicBlock, [3, 4, 6, 3], **kwargs)
     return model
+
+def resnet50( **kwargs):
+    """Constructs a ResNet-50 model.
+    Args:
+        pretrained (bool): If True, returns a model pre-trained on ImageNet
+    """
+    model = ResNetEmbedding(Bottleneck, [3, 4, 6, 3], **kwargs)
+    return model

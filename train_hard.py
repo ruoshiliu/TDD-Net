@@ -16,12 +16,13 @@ from torch.autograd import Variable
 from torchvision import datasets, models, transforms
 import time
 import os
-from grayscale_resnet import resnet18, resnet34
+from grayscale_resnet import resnet18, resnet34, resnet50
 from torchvision.models.resnet import BasicBlock, conv3x3, Bottleneck
 
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
+output_path = '/home/rliu/defect_classifier/models/python/res34_600epo_hard_01-07-18.model'
 batch_size = 256
 
 data_transform = transforms.Compose([
@@ -29,7 +30,7 @@ data_transform = transforms.Compose([
         transforms.RandomRotation((-90,90)),
         torchvision.transforms.RandomVerticalFlip(p=0.5),
         torchvision.transforms.RandomHorizontalFlip(p=0.5),
-        torchvision.transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0, hue=0),
+#         torchvision.transforms.ColorJitter(brightness=0.1, contrast=0.1, saturation=0, hue=0),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.3019],
                              std=[0.1909])
@@ -188,11 +189,11 @@ criterion = nn.NLLLoss()
 optimizer_ft = optim.Adam(model_ft.parameters(), lr=0.00025)
 
 # Decay LR by a factor of 0.1 every 7 epochs
-exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=100, gamma=0.1)
+exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=200, gamma=0.1)
 
 # train model
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=500)
+                       num_epochs=600)
 torch.save(model_ft, output_path)
 
 

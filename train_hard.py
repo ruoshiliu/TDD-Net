@@ -18,7 +18,7 @@ import time
 import os
 from grayscale_resnet import resnet18, resnet34, resnet50
 from torchvision.models.resnet import BasicBlock, conv3x3, Bottleneck
-
+cd p
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
@@ -39,10 +39,10 @@ data_transform = transforms.Compose([
 trainset = defectDataset_df(df = split_and_sample(method = 'hard',n_samples = 1995), window_size = window_size, transforms=data_transform)
 trainloader = torch.utils.data.DataLoader(trainset,
                                              batch_size=batch_size, shuffle=True,
-                                             num_workers=8)
+                                             num_workers=8, drop_last=True)
 print("trainloader ready!")
 
-testset = defectDataset_df(df = split_and_sample(df_train = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),
+testset = defectDataset_df(df = split_and_sample(df_train = pd.read_csv('/home/rliu/v2_pytorch_yolo2_iclr/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),
                                                       method = 'hard',n_samples = 500), window_size = window_size, transforms=data_transform)
 testloader = torch.utils.data.DataLoader(testset,
                                              batch_size=batch_size, shuffle=True,

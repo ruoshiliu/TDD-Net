@@ -146,14 +146,14 @@ def sample_point_circular(circle_min = 0.02, circle_max = 0.07):
     return x,y
 
 def split_and_sample(df_train = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', sep=" ")
-                             , n_samples = 1000, non_inner_circle = 0.02, non_outer_circle = 0.07, method = 'uniform'):
+                             , n_samples = 1000, non_pos_ratio = 1, non_inner_circle = 0.02, non_outer_circle = 0.07, method = 'uniform'):
     df_pos = df_train[df_train['class'] == 0]
     df_neg = df_train[df_train['class'] == 1]
     df_pos_o = df_train[df_train['class'] == 2]
     df_nuc = df_train[df_train['class'] == 3]
     frames = [df_pos.sample(n=n_samples), df_neg.sample(n=n_samples), df_pos_o.sample(n=n_samples), df_nuc.sample(n=n_samples)]
     df_train_samples = pd.concat(frames)
-    df_train_non = df_train_samples.sample(n=n_samples)
+    df_train_non = df_train_samples.sample(n=n_samples*non_pos_ratio)
     # print(df_train_non.head(10))
     if method=='hard':
         for index, row in df_train_non.iterrows():

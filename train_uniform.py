@@ -39,7 +39,7 @@ data_transform = transforms.Compose([
 trainset = defectDataset_df(df = split_and_sample(method = 'uniform',n_samples = 1995), window_size = window_size, transforms=data_transform)
 trainloader = torch.utils.data.DataLoader(trainset,
                                              batch_size=batch_size, shuffle=True,
-                                             num_workers=8)
+                                             num_workers=8, drop_last=True)
 print("trainloader ready!")
 
 testset = defectDataset_df(df = split_and_sample(df_train = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),

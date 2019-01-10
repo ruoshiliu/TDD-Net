@@ -1,0 +1,5 @@
+train  = an_train.txt
+valid  = an_test.txt
+names = data/an.names
+backup = backup
+gpus  = 2

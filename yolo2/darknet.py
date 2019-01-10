@@ -267,19 +267,19 @@ class Darknet(nn.Module):
                 if batch_normalize:
                     start = load_conv_bn(buf, start, model[0], model[1])
                 else:
-                    print(model[0])
-                    print(buf)
-                    print(start)
-                    conv_model = model[0]
-                    num_w = conv_model.weight.numel()
-                    num_b = conv_model.bias.numel()
+#                     print(model[0])
+#                     print(buf)
+#                     print(start)
+#                     conv_model = model[0]
+#                     num_w = conv_model.weight.numel()
+#                     num_b = conv_model.bias.numel()
 #                     conv_model.bias.data.copy_(torch.from_numpy(buf[start:start+num_b]));   start = start + num_b
                     #     conv_model.weight.data.copy_(torch.reshape(torch.from_numpy(buf[start:start+num_w]),(conv_model.weight.shape[0],conv_model.weight.shape[1], conv_model.weight.shape[2]))); start=start + num_w
-                    print(conv_model.weight.data.shape)
-                    print(conv_model.bias.numel())
-                    print(conv_model.weight.numel())
-                    print(buf.shape)
-                    print(start+num_w)
+#                     print(conv_model.weight.data.shape)
+#                     print(conv_model.bias.numel())
+#                     print(conv_model.weight.numel())
+#                     print(buf.shape)
+#                     print(start+num_w)
 #                     conv_model.weight.data.copy_(torch.reshape(torch.from_numpy(buf[start:start + num_w]), (
 #                     conv_model.weight.shape)));
 #                     start = start + num_w

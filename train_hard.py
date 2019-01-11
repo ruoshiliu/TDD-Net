@@ -173,7 +173,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
 
 # transfer learning resnet18
-model_ft = resnet34()
+model_ft = resnet18()
 num_ftrs = model_ft.fc.in_features
 model_ft.fc = nn.Linear(num_ftrs, num_of_classes)
 

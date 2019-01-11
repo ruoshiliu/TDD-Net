@@ -24,6 +24,7 @@ pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
 output_path = '/home/rliu/defect_classifier/models/python/res34_600epo_uniform_01-10-18.model'
 batch_size = 256
+non_pos_ratio = 4
 
 data_transform = transforms.Compose([
         transforms.RandomResizedCrop(200, scale=(1, 1), ratio=(1, 1)),
@@ -62,17 +63,17 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         running_loss = 0.0
         running_corrects = 0
 
-        trainset = defectDataset_df(df = split_and_sample(method = 'uniform',n_samples = 1995), window_size = window_size, transforms=data_transform)
+        trainset = defectDataset_df(df = split_and_sample(method = 'uniform',n_samples = 1995, non_pos_ratio = non_pos_ratio), window_size = window_size, transforms=data_transform)
         trainloader = torch.utils.data.DataLoader(trainset,
                                              batch_size=batch_size, shuffle=True,
-                                             num_workers=8, drop_last=True)
+                                             num_workers=16, drop_last=True)
         print("trainloader ready!")
 
         testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),
                                                               method = 'uniform',n_samples = 500), window_size = window_size, transforms=data_transform)
         testloader = torch.utils.data.DataLoader(testset,
                                                      batch_size=batch_size, shuffle=True,
-                                                     num_workers=8)
+                                                     num_workers=16)
         print("testloader ready!")
         # Iterate over data.
         for data in trainloader:
@@ -181,7 +182,9 @@ if use_gpu:
     model_ft = torch.nn.DataParallel(model_ft)
     model_ft.to(device)
 
-criterion = nn.NLLLoss()
+weights = [1.0, 1.0, 1.0, 1.0, 1.0/non_pos_ratio]
+class_weights = torch.FloatTensor(weights).to(device)
+criterion = nn.NLLLoss(weight = class_weights)
 #criterion = nn.CrossEntropyLoss()
 
 # Observe that all parameters are being optimized
@@ -193,8 +196,9 @@ exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=100, gamma=0.5)
 
 # train model
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,
-                       num_epochs=600)
+                       num_epochs=800)
 torch.save(model_ft, output_path)
+
 
 
 

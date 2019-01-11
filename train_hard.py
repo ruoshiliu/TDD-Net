@@ -18,7 +18,7 @@ import time
 import os
 from grayscale_resnet import resnet18, resnet34, resnet50
 from torchvision.models.resnet import BasicBlock, conv3x3, Bottleneck
-cd p
+
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
@@ -36,18 +36,6 @@ data_transform = transforms.Compose([
                              std=[0.1909])
     ])
 
-trainset = defectDataset_df(df = split_and_sample(method = 'hard',n_samples = 1995), window_size = window_size, transforms=data_transform)
-trainloader = torch.utils.data.DataLoader(trainset,
-                                             batch_size=batch_size, shuffle=True,
-                                             num_workers=8, drop_last=True)
-print("trainloader ready!")
-
-testset = defectDataset_df(df = split_and_sample(df_train = pd.read_csv('/home/rliu/v2_pytorch_yolo2_iclr/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),
-                                                      method = 'hard',n_samples = 500), window_size = window_size, transforms=data_transform)
-testloader = torch.utils.data.DataLoader(testset,
-                                             batch_size=batch_size, shuffle=True,
-                                             num_workers=8)
-print("testloader ready!")
 
 use_gpu = torch.cuda.is_available()
 if use_gpu:
@@ -74,6 +62,18 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         running_loss = 0.0
         running_corrects = 0
 
+        trainset = defectDataset_df(df = split_and_sample(method = 'hard',n_samples = 1995), window_size = window_size, transforms=data_transform)
+        trainloader = torch.utils.data.DataLoader(trainset,
+                                             batch_size=batch_size, shuffle=True,
+                                             num_workers=8, drop_last=True)
+        print("trainloader ready!")
+
+        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),
+                                                              method = 'hard',n_samples = 500), window_size = window_size, transforms=data_transform)
+        testloader = torch.utils.data.DataLoader(testset,
+                                                     batch_size=batch_size, shuffle=True,
+                                                     num_workers=8)
+        print("testloader ready!")
         # Iterate over data.
         for data in trainloader:
             # get the inputs
@@ -189,7 +189,7 @@ criterion = nn.NLLLoss()
 optimizer_ft = optim.Adam(model_ft.parameters(), lr=0.00025)
 
 # Decay LR by a factor of 0.1 every 7 epochs
-exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=200, gamma=0.1)
+exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=100, gamma=0.5)
 
 # train model
 model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler,

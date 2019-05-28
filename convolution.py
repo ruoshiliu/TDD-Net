@@ -25,9 +25,9 @@ step_size = 2
 window_size = 45
 batch_size = 512
 num_workers = 8
-output_path = '/home/rliu/defect_classifier/convolution_test/'
-df_yolo = pd.read_csv('/home/rliu/github/defect_classifier/yolo2_dm/results/test_yolo.csv', sep=' ')
-df_test = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" ")
+output_path = '/home/rliu/defect_classifier/convolution_train/'
+df_yolo = pd.read_csv('/home/rliu/github/defect_classifier/yolo2_dm/results/train_yolo.csv', sep=' ')
+df_train = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', sep=" ")
 
 data_transform = transforms.Compose([
         transforms.RandomResizedCrop(200, scale=(1, 1), ratio=(1, 1)),
@@ -77,7 +77,7 @@ model_FNN.train(False)
 
 since = time.time()
 
-for i in df_test.image_index.unique():
+for i in df_train.image_index.unique():
     testset = defectDataset_convolution(image_index = i, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/', 
                  coord_path = '/home/rliu/coord_list.npy',window_size=45, transforms=data_transform)
     testloader = torch.utils.data.DataLoader(testset,

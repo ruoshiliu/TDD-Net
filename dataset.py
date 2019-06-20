@@ -75,8 +75,7 @@ class defectDataset_csv(Dataset):
 
     def __len__(self):
         return len(self.data.index)
-        
-
+    
 if __name__ == "__main__":
     transformations = transforms.Compose([transforms.ToTensor()])
 #     defect_from_csv = \
@@ -134,6 +133,41 @@ if __name__ == "__main__":
 #     defect_from_csv = \
 #         defectDataset('../data/mnist_in_csv.csv', 28, 28, transformations)
 
+
+class defectDataset_convolution(Dataset):
+    def __init__(self, image_index = 6501, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/', coord_path = '/home/rliu/coord_list.npy',window_size=45, mask = create_circular_mask(200,200), transforms=None):
+        """
+        Args:
+            image_index: index of image being processed
+            window_size: size of sliding window
+            transform: pytorch transforms for transforms and tensor conversion
+        """
+        self.image = torchvision.transforms.functional.resize(Image.open(img_path + '%06.0f.jpg' % image_index).convert('L'), (300,300), interpolation=2)
+        self.coords = np.load(coord_path)
+        self.mask = mask
+        self.window_size = window_size
+        self.transforms = transforms
+
+    def __getitem__(self, index):
+        x,y = self.coords[index]
+        img_resized = self.image.crop(box=(x - self.window_size/2,y - self.window_size/2, x + self.window_size/2, y + self.window_size/2))
+        img_resized = torchvision.transforms.functional.resize(img_resized, (200,200), interpolation=2)
+        img_masked = img_resized * mask
+        img_masked = Image.fromarray(img_masked.astype('uint8'), 'L')
+        # Transform image to tensor
+        if self.transforms is not None:
+            img_masked = self.transforms(img_masked)
+        # Return image and the label
+        return (img_masked)
+
+    def __len__(self):
+        return self.coords.shape[0]
+        
+
+if __name__ == "__main__":
+    transformations = transforms.Compose([transforms.ToTensor()])
+#     defect_from_csv = \
+#         defectDataset('../data/mnist_in_csv.csv', 28, 28, transformations)
 
 def sample_point_circular(circle_min = 0.02, circle_max = 0.07):
     # random angle

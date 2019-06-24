@@ -373,7 +373,6 @@ def checkYolo_checkAllBoxes(df_yolo, df_results, conf_thres_pos = 0.001, conf_th
 def connect_detection(df_results, inspect_range = 16, inspect_radius = 0.05, inspect_thres_low = 0.3, inspect_thres_high = 0.6):
     head_tail = np.append(df_results['image_index'].unique()[0:(int)(inspect_range/2)], df_results['image_index'].unique()[(int)(len(df_results['image_index'].unique()) - inspect_range/2):(int)(len(df_results['image_index'].unique()))])
     for index_fr, row_fr in df_results.iterrows():
-        print(index_fr)
         if row_fr['image_index'] not in head_tail and row_fr['class'] == 1:
             head = row_fr['image_index']-inspect_range/2
             tail = row_fr['image_index']+inspect_range/2

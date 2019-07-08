@@ -93,7 +93,7 @@ class defectDataset_df(Dataset):
         
 
 class defectDataset_convolution(Dataset):
-    def __init__(self, image_index = 6501, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/', coord_path = '/home/rliu/coord_list.npy',window_size=45, mask = create_circular_mask(200,200), transforms=None):
+    def __init__(self, image_index = 6501, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/',window_size=45, mask = create_circular_mask(200,200), transforms=None):
         """
         Args:
             image_index: index of image being processed
@@ -101,7 +101,12 @@ class defectDataset_convolution(Dataset):
             transform: pytorch transforms for transforms and tensor conversion
         """
         self.image = torchvision.transforms.functional.resize(Image.open(img_path + '%06.0f.jpg' % image_index).convert('L'), (300,300), interpolation=2)
-        self.coords = np.load(coord_path)
+        
+        coord_list = np.empty([0,2],dtype=int)
+        for i in np.arange(0,300,2):
+            for j in np.arange(0,300,2):
+                coord_list = np.append(coord_list,[[i,j]],axis = 0);
+        self.coords = coord_list
         self.mask = mask
         self.window_size = window_size
         self.transforms = transforms

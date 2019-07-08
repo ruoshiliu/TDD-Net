@@ -11,10 +11,10 @@ import time
 
 step_size = 2
 window_size = 45
-batch_size = 512
-num_workers = 8
-output_path = '/home/rliu/defect_classifier/convolution_train/'
-df_yolo = pd.read_csv('/home/rliu/github/defect_classifier/yolo2_dm/results/train_yolo.csv', sep=' ')
+batch_size = 4096
+num_workers = 16
+output_path = '/home/rliu/TDD-Net/convolution_train/'
+df_yolo = pd.read_csv('/home/rliu/github/TDD-Net/yolo2_dm/results/train_yolo.csv', sep=' ')
 df_train = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', sep=" ")
 
 data_transform = transforms.Compose([
@@ -24,14 +24,30 @@ data_transform = transforms.Compose([
                              std=[0.1909])
     ])
 
+class Net(nn.Module):
+    def __init__(self, input_size, hidden_size, num_classes):
+        super(Net, self).__init__()                    # Inherited from the parent class nn.Module
+        self.fc1 = nn.Linear(input_size, hidden_size)  # 1st Full-Connected Layer: 10 (input data) -> 500 (hidden node)
+        self.relu = nn.ReLU()                          # Non-Linear ReLU Layer: max(0,x)
+        self.fc2 = nn.Linear(hidden_size, num_classes) # 2nd Full-Connected Layer: 500 (hidden node) -> 5 (output class)
+#         self.relu = nn.ReLU()                          # Non-Linear ReLU Layer: max(0,x)
+#         self.fc3 = nn.Linear(hidden_size, num_classes) # 3rd Full-Connected Layer: 500 (hidden node) -> 5 (output class)
+    
+    def forward(self, x):                              # Forward pass: stacking each layer together
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+#         out = self.relu(out)
+#         out = self.fc3(out)
+        return out
 
 classes = ["pos","neg","pos_o","nuc","non"]
 num_of_classes = len(classes)
-model_uniform = torch.load('/home/rliu/defect_classifier/models/python/ml/res34_600epo_uniform_01-07-18.model')
+model_uniform = torch.load('/home/rliu/TDD-Net/models/python/ml/res34_600epo_uniform_01-07-18.model')
 model_uniform.eval()
-model_hard = torch.load('/home/rliu/defect_classifier/models/python/ml/res34_600epo_hard_01-07-18.model')
+model_hard = torch.load('/home/rliu/TDD-Net/models/python/ml/res34_600epo_hard_01-07-18.model')
 model_hard.eval()
-model_FNN = torch.load('/home/rliu/defect_classifier/models/python/ml/2x100_28epo_yolo_01-13-18.model')
+model_FNN = torch.load('/home/rliu/TDD-Net/models/python/ml/2x100_28epo_yolo_01-13-18.model')
 model_FNN.eval()
 use_gpu = torch.cuda.is_available()
 if use_gpu:
@@ -51,15 +67,18 @@ model_FNN.train(False)
 since = time.time()
 
 for i in df_train.image_index.unique():
-    testset = defectDataset_convolution(image_index = i, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/', 
-                 coord_path = '/home/rliu/coord_list.npy',window_size=45, transforms=data_transform)
+    testset = defectDataset_convolution(image_index = i, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/',window_size=45, transforms=data_transform)
     testloader = torch.utils.data.DataLoader(testset,
                                                      batch_size=batch_size, shuffle=False,
                                                      num_workers=num_workers)
-#     print('Test loader ready!')
+    print("testloader ready!")
+
     with torch.no_grad():
         confidence_pos, confidence_neg, confidence_pos_o, confidence_nuc, confidence_non = np.array([]), np.array([]), np.array([]), np.array([]), np.array([])
+        iii = 0
         for inputs in testloader:
+            iii += 1
+            print(iii)
             with torch.cuda.device(0):
                 inputs = inputs.cuda()
             outputs_uniform = model_uniform(inputs)

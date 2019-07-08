@@ -67,7 +67,7 @@ model_FNN.train(False)
 since = time.time()
 
 for i in df_train.image_index.unique():
-    testset = defectDataset_convolution(image_index = i, img_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/JPEGImages/',window_size=45, transforms=data_transform)
+    testset = defectDataset_convolution(image_index = i, img_path='/home/rliu/TDD-Net/data/', stride = 2, window_size=45, transforms=data_transform)
     testloader = torch.utils.data.DataLoader(testset,
                                                      batch_size=batch_size, shuffle=False,
                                                      num_workers=num_workers)

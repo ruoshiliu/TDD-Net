@@ -1,24 +1,12 @@
 import pandas as pd
 import numpy as np
-from PIL import Image
-from PIL import ImageOps
 import PIL
 import torch, torchvision
 from torchvision import transforms, datasets
 from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
 from dataset import defectDataset_convolution
-import random
-import math
-import seaborn
-from  matplotlib import pyplot
 import torch.nn.functional as F
-import matplotlib.image as mpimg
 import torch.nn as nn
-from scipy import ndimage as ndi
-import matplotlib.pyplot as plt
-from skimage.feature import peak_local_max
-from skimage import data, img_as_float
 import time
 
 step_size = 2
@@ -36,21 +24,6 @@ data_transform = transforms.Compose([
                              std=[0.1909])
     ])
 
-class Net(nn.Module):
-    def __init__(self, input_size, hidden_size, num_classes):
-        super(Net, self).__init__()                    # Inherited from the parent class nn.Module
-        self.fc1 = nn.Linear(input_size, hidden_size)  # 1st Full-Connected Layer: 10 (input data) -> 500 (hidden node)
-        self.relu = nn.ReLU()                          # Non-Linear ReLU Layer: max(0,x)
-        self.fc2 = nn.Linear(hidden_size, num_classes) # 2nd Full-Connected Layer: 500 (hidden node) -> 5 (output class)
-#         self.relu = nn.ReLU()                          # Non-Linear ReLU Layer: max(0,x)
-#         self.fc3 = nn.Linear(hidden_size, num_classes) # 3rd Full-Connected Layer: 500 (hidden node) -> 5 (output class)
-    def forward(self, x):                              # Forward pass: stacking each layer together
-        out = self.fc1(x)
-        out = self.relu(out)
-        out = self.fc2(out)
-#         out = self.relu(out)
-#         out = self.fc3(out)
-        return out
 
 classes = ["pos","neg","pos_o","nuc","non"]
 num_of_classes = len(classes)

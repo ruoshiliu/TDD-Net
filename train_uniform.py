@@ -1,14 +1,8 @@
 import pandas as pd
 import numpy as np
-from PIL import Image
-from PIL import ImageOps
-import PIL
 import torch, torchvision
 from torch.utils.data import Dataset, DataLoader
-import matplotlib.pyplot as plt
 from dataset import defectDataset_df, create_circular_mask, split_and_sample
-import random
-import math
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
@@ -17,7 +11,6 @@ from torchvision import datasets, models, transforms
 import time
 import os
 from grayscale_resnet import resnet18, resnet34, resnet50
-from torchvision.models.resnet import BasicBlock, conv3x3, Bottleneck
 
 window_size = 45
 pad_size = window_size

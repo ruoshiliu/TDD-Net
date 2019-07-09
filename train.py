@@ -72,6 +72,7 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
         class_correct = list(0. for i in range(5))
         class_total = list(0. for i in range(5))
         with torch.no_grad():
+            model.train(False)
             for data in testloader:
                 inputs, labels = data
                 inputs, labels = inputs.to(device), labels.to(device)

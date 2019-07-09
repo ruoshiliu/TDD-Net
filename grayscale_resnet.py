@@ -1,5 +1,4 @@
 import torch.nn as nn
-import math
 from torchvision.models.resnet import BasicBlock, conv3x3, Bottleneck
 
 def conv1x1(in_planes, out_planes, stride=1):

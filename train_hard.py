@@ -15,11 +15,11 @@ pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
 output_path = '/home/rliu/defect_classifier/models/python/res34_600epo_uniform_01-10-18.model'
 batch_size = 128
-non_pos_ratio = 4
+non_pos_ratio = 1
 train_num = 1995
 test_num = 500
 mode = 'next' # or "tiny"
-method = 'uniform'
+method = 'hard'
 
 data_transform = transforms.Compose([
         transforms.RandomResizedCrop(200, scale=(1, 1), ratio=(1, 1)),
@@ -62,7 +62,7 @@ class_weights = torch.FloatTensor(weights).to(device)
 
 criterion = nn.NLLLoss(weight = class_weights)
 # optimizer = optim.SGD(model.parameters(), lr=0.01,  momentum=0.9)
-optimizer = optim.Adam(model.parameters(), lr=0.0001)
+optimizer = optim.Adam(model.parameters(), lr=0.00025, weight_decay=0)
 
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.5)

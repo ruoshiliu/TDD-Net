@@ -71,7 +71,7 @@ class defectDataset_df(Dataset):
         y = 1 - labels['y'] # origin of PIL image is top-left
         img_index = labels['image_index']
         img = Image.open(self.img_path + '%06.0f.jpg' % img_index).convert('L')
-        img = torchvision.transforms.functional.resize(img, (300,300), interpolation=2)
+#         img = torchvision.transforms.functional.resize(img, (300,300), interpolation=2)
         width, height = img.size
         img = ImageOps.expand(img, border=self.pad_size, fill=0)
         xmin = width * x - self.window_size/2 + self.pad_size

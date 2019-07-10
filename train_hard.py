@@ -13,13 +13,16 @@ from train import train_model
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
-output_path = '/home/rliu/defect_classifier/models/python/res34_600epo_uniform_01-10-18.model'
-batch_size = 128
+output_path = '/home/rliu/defect_classifier/models/python/resNext50_600epo_hard_01-10-18.model'
+batch_size = 256
 non_pos_ratio = 1
 train_num = 1995
 test_num = 500
 mode = 'next' # or "tiny"
 method = 'hard'
+num_epochs = 600
+df_train_path = '/home/rliu/TDD-Net/csv_labels/112000train.csv'
+df_test_path = '/home/rliu/TDD-Net/csv_labels/112000test.csv'
 
 data_transform = transforms.Compose([
         transforms.RandomResizedCrop(200, scale=(1, 1), ratio=(1, 1)),
@@ -37,9 +40,6 @@ if use_gpu:
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-classes = ["pos","neg","pos_o","nuc","non"]
-num_of_classes = len(classes)
-
 # transfer learning resnet34
 if mode == "full":
     model = resnet34()
@@ -50,7 +50,7 @@ elif mode == "next":
 
 # change output channel for last fully connected layer according to number of classes
 num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, num_of_classes) 
+model.fc = nn.Linear(num_ftrs, len(classes)) 
 
 if use_gpu:
     model = torch.nn.DataParallel(model)
@@ -68,5 +68,5 @@ optimizer = optim.Adam(model.parameters(), lr=0.00025, weight_decay=0)
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.5)
 
 # train model
-model = train_model(model, criterion, optimizer, exp_lr_scheduler, data_transform, train_num = train_num, test_num = test_num, non_pos_ratio = non_pos_ratio, window_size = window_size, batch_size = batch_size, device = device, classes = classes, num_epochs=800, method = method)
+model = train_model(model, criterion, optimizer, exp_lr_scheduler, data_transform, train_num = train_num, test_num = test_num, non_pos_ratio = non_pos_ratio, window_size = window_size, batch_size = batch_size, device = device, classes = classes, df_train_path = df_train_path, df_test_path = df_test_path, num_epochs=num_epochs, method = method)
 torch.save(model.module, output_path)

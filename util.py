@@ -18,7 +18,7 @@ def create_circular_mask(h, w, center=None, radius=None):
     return mask
 
 
-def sample_point_circular(circle_min = 0.02, circle_max = 0.07):
+def sample_point_circular(circle_min, circle_max):
     # random angle
     alpha = 2 * math.pi * random.random()
     # random radius
@@ -44,6 +44,18 @@ def split_and_sample(
         df_labels_non = df_labels_samples.sample(n=n_samples*non_pos_ratio)
         for index, row in df_labels_non.iterrows():
             min_dis = 0  # make sure go in for loop
+            '''
+            small-defect density image, bigger sampling range, vice versa
+            '''
+            if row['image_size'] == 300: 
+                non_inner_circle = 0.02
+                non_outer_circle = 0.07
+            elif row['image_size'] == 600:
+                non_inner_circle = 0.01
+                non_outer_circle = 0.035
+            elif  row['image_size'] == 900:
+                non_inner_circle = 0.007
+                non_outer_circle = 0.024
             while min_dis < non_inner_circle:
                 dx,dy = sample_point_circular(non_inner_circle, non_outer_circle)
                 new_point = [row.x+dx, row.y+dy]
@@ -60,6 +72,18 @@ def split_and_sample(
         df_labels_non = df_labels_samples.sample(n=n_samples*non_pos_ratio)
         for index, row in df_labels_non.iterrows():
             min_dis = 0
+            '''
+            small-defect density image, bigger sampling range, vice versa
+            '''
+            if row['image_size'] == 300: 
+                non_inner_circle = 0.02
+                non_outer_circle = 0.07
+            elif row['image_size'] == 600:
+                non_inner_circle = 0.01
+                non_outer_circle = 0.035
+            elif  row['image_size'] == 900:
+                non_inner_circle = 0.007
+                non_outer_circle = 0.024
             while min_dis < non_inner_circle:
                 new_point = [random.random(),random.random()]
                 df_image = df_labels[df_labels['image_index'] == row['image_index']]

@@ -13,13 +13,16 @@ from train import train_model
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg","pos_o","nuc","non"]
-output_path = '/home/rliu/defect_classifier/models/python/res34_600epo_uniform_01-10-18.model'
-batch_size = 128
+output_path = '/home/rliu/defect_classifier/models/python/resNext50_600epo_uniform_07-10-18.model'
+batch_size = 256
 non_pos_ratio = 4
 train_num = 1995
 test_num = 500
 mode = 'full' # or "tiny"
 method = 'uniform'
+num_epochs = 600
+df_train_path = '/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv'
+df_test_path = '/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv'
 
 data_transform = transforms.Compose([
         transforms.RandomResizedCrop(200, scale=(1, 1), ratio=(1, 1)),
@@ -37,9 +40,6 @@ if use_gpu:
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-classes = ["pos","neg","pos_o","nuc","non"]
-num_of_classes = len(classes)
-
 # transfer learning resnet34
 if mode == "full":
     model = resnet34()
@@ -50,7 +50,7 @@ elif mode == "next":
 
 # change output channel for last fully connected layer according to number of classes
 num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, num_of_classes) 
+model.fc = nn.Linear(num_ftrs, len(classes))
 
 if use_gpu:
     model = torch.nn.DataParallel(model)
@@ -62,11 +62,11 @@ class_weights = torch.FloatTensor(weights).to(device)
 
 criterion = nn.NLLLoss(weight = class_weights)
 # optimizer = optim.SGD(model.parameters(), lr=0.01,  momentum=0.9)
-optimizer = optim.Adam(model.parameters(), lr=0.00025, weight_decay=5e-5)
+optimizer = optim.Adam(model.parameters(), lr=0.00025, weight_decay=0)
 
 # Decay LR by a factor of 0.1 every 7 epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.5)
 
 # train model
-model = train_model(model, criterion, optimizer, exp_lr_scheduler, data_transform, train_num = train_num, test_num = test_num, non_pos_ratio = non_pos_ratio, window_size = window_size, batch_size = batch_size, device = device, classes = classes, num_epochs=800, method = method)
+model = train_model(model, criterion, optimizer, exp_lr_scheduler, data_transform, train_num = train_num, test_num = test_num, non_pos_ratio = non_pos_ratio, window_size = window_size, batch_size = batch_size, device = device, classes = classes, df_train_path = df_train_path, df_test_path = df_test_path, num_epochs=num_epochs, method = method)
 torch.save(model.module, output_path)

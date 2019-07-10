@@ -51,7 +51,7 @@ class defectDataset_csv(Dataset):
         return len(self.data.index)
 
 class defectDataset_df(Dataset):
-    def __init__(self, df = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', sep=" "), img_path='/home/rliu/TDD-Net/data/', window_size=50, pad_size=50, mask = create_circular_mask(200,200), transforms=None):
+    def __init__(self, df, img_path='/home/rliu/TDD-Net/data/', window_size=50, pad_size=50, mask = create_circular_mask(200,200), transforms=None):
         """
         Args:
             df: dataframes of training data

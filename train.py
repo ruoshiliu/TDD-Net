@@ -9,7 +9,7 @@ from torchvision import datasets, models, transforms
 import time
 import os
 
-def train_model(model, criterion, optimizer, scheduler, transform, train_num, test_num, non_pos_ratio, window_size, batch_size, device, classes, num_epochs=500, method = 'uniform', use_gpu = True):
+def train_model(model, criterion, optimizer, scheduler, transform, train_num, test_num, non_pos_ratio, window_size, batch_size, device, classes, df_train_path, df_test_path, num_epochs, method, use_gpu = True):
     since = time.time()
 
     best_model_wts = model.state_dict()
@@ -25,13 +25,11 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
         running_loss = 0.0
         running_corrects = 0
 
-        trainset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', sep=" "),
-                                                          method = method, n_samples = train_num, non_pos_ratio = non_pos_ratio), window_size = window_size, transforms=transform)
+        trainset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_train_path, sep=" "), method = method, n_samples = train_num, non_pos_ratio = non_pos_ratio), window_size = window_size, transforms=transform)
         trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=16, drop_last=True)
         print("trainloader ready!")
 
-        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/test.csv', sep=" "),
-                                                              method = method, n_samples = test_num), window_size = window_size, transforms=transform)
+        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_test_path, sep=" "), method = method, n_samples = test_num), window_size = window_size, transforms=transform)
         testloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=16)
         print("testloader ready!")
         # Iterate over data.

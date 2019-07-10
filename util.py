@@ -59,7 +59,11 @@ def split_and_sample(
             while min_dis < non_inner_circle:
                 dx,dy = sample_point_circular(non_inner_circle, non_outer_circle)
                 new_point = [row.x+dx, row.y+dy]
-                df_image = df_labels[df_labels['image_index'] == row['image_index']] # retrive all points in the image
+                df_image = df_labels[(df_labels['image_index'] == row['image_index']) &
+                                    (df_labels['x'] <= new_point[0] + non_inner_circle) &
+                                    (df_labels['x'] >= new_point[0] - non_inner_circle) &
+                                    (df_labels['y'] <= new_point[1] + non_inner_circle) &
+                                    (df_labels['y'] >= new_point[1] - non_inner_circle)] # retrive all points within inner circle
                 min_dis = 1
                 for index_im, row_im in df_image.iterrows(): # check distance from new_point to each point, if smaller than threshold than thow away
                     dis = math.sqrt(math.pow(new_point[0]-row.x,2)+math.pow(new_point[1]-row.y,2))
@@ -86,7 +90,11 @@ def split_and_sample(
                 non_outer_circle = 0.024
             while min_dis < non_inner_circle:
                 new_point = [random.random(),random.random()]
-                df_image = df_labels[df_labels['image_index'] == row['image_index']]
+                df_image = df_labels[(df_labels['image_index'] == row['image_index']) &
+                                    (df_labels['x'] <= new_point[0] + non_inner_circle) &
+                                    (df_labels['x'] >= new_point[0] - non_inner_circle) &
+                                    (df_labels['y'] <= new_point[1] + non_inner_circle) &
+                                    (df_labels['y'] >= new_point[1] - non_inner_circle)] # retrive all points within inner circle
                 min_dis = 1
                 for index_im, row_im in df_image.iterrows():
                     dis = math.sqrt(math.pow(new_point[0]-row.x,2)+math.pow(new_point[1]-row.y,2))

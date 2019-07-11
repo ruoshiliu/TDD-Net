@@ -13,7 +13,7 @@ from train import train_model
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg"] # classes has to match the 'classes' column in labels csv
-output_path = '/home/rliu/defect_classifier/models/python/resNext50_600epo_hard_01-10-18.model'
+output_path = '/home/rliu/defect_classifier/models/python/res34-600epo_hard_01-10-18.model'
 batch_size = 256
 non_pos_ratio = 1
 train_num = 10000
@@ -29,10 +29,9 @@ data_transform = transforms.Compose([
         transforms.RandomRotation((-90,90)),
         torchvision.transforms.RandomVerticalFlip(p=0.5),
         torchvision.transforms.RandomHorizontalFlip(p=0.5),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.3019],
-                             std=[0.1909])
-    ])
+        torchvision.transforms.RandomAffine(180, shear = 20),
+        torchvision.transforms.RandomPerspective(distortion_scale=0.1, p=0.1, interpolation=3),
+        torchvision.transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0, hue=0)])
 
 use_gpu = torch.cuda.is_available()
 if use_gpu:

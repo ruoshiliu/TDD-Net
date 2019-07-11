@@ -40,10 +40,12 @@ class defectDataset_csv(Dataset):
         ymax = height * y + self.window_size/2 + self.pad_size
         img_resized = img.crop((xmin, ymin, xmax, ymax))
         img_resized = torchvision.transforms.functional.resize(img_resized, (200,200), interpolation=2)
+        if self.transforms is not None:
+            img_resized = self.transforms(img_resized)
         img_masked = img_resized * self.mask
         img_masked = Image.fromarray(img_masked.astype('uint8'), 'L')
-        if self.transforms is not None:
-            img_masked = self.transforms(img_masked)
+        toTensor = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.3019], std=[0.1909])]) # toTensor
+        img_masked = toTensor(img_masked)
         # Return image and the label
         return (img_masked, single_image_label)
 
@@ -80,10 +82,12 @@ class defectDataset_df(Dataset):
         ymax = height * y + self.window_size/2 + self.pad_size
         img_resized = img.crop((xmin, ymin, xmax, ymax))
         img_resized = torchvision.transforms.functional.resize(img_resized, (200,200), interpolation=2)
+        if self.transforms is not None:
+            img_resized = self.transforms(img_resized)
         img_masked = img_resized * self.mask
         img_masked = Image.fromarray(img_masked.astype('uint8'), 'L')
-        if self.transforms is not None:
-            img_masked = self.transforms(img_masked)
+        toTensor = transforms.Compose([transforms.ToTensor(), transforms.Normalize(mean=[0.3019], std=[0.1909])]) # toTensor
+        img_masked = toTensor(img_masked)
         # Return image and the label
         return (img_masked, single_image_label)
 

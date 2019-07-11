@@ -28,17 +28,20 @@ def sample_point_circular(circle_min, circle_max):
     y = r * math.sin(alpha)
     return x,y
 
-def split_and_sample(
+def split_and_sample(classes,
     df_labels = pd.read_csv('/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', sep=" "),
     df_yolo = pd.read_csv('/home/rliu/github/TDD-Net/yolo2_dm/results/train_yolo.csv', sep=' ')
     , n_samples = 1000, non_pos_ratio = 1, non_inner_circle = 0.02, non_outer_circle = 0.07, method = 'uniform'):
-    
-    df_pos = df_labels[df_labels['class'] == 0]
-    df_neg = df_labels[df_labels['class'] == 1]
-    df_pos_o = df_labels[df_labels['class'] == 2]
-    df_nuc = df_labels[df_labels['class'] == 3]
-    frames = [df_pos.sample(n=n_samples), df_neg.sample(n=n_samples), df_pos_o.sample(n=n_samples), df_nuc.sample(n=n_samples)]
-    df_labels_samples = pd.concat(frames)
+    df_labels_samples = pd.DataFrame()
+    for i in range(len(classes)):
+        df = df_labels[df_labels['class'] == i].sample(n=n_samples)
+        df_labels_samples = df_labels_samples.append(df)
+#     df_pos = df_labels[df_labels['class'] == 0]
+#     df_neg = df_labels[df_labels['class'] == 1]
+#     df_pos_o = df_labels[df_labels['class'] == 2]
+#     df_nuc = df_labels[df_labels['class'] == 3]
+#     frames = [df_pos.sample(n=n_samples), df_neg.sample(n=n_samples), df_pos_o.sample(n=n_samples), df_nuc.sample(n=n_samples)]
+#     df_labels_samples = pd.concat(frames)
     # print(df_labels_non.head(10))
     if method=='hard':
         df_labels_non = df_labels_samples.sample(n=n_samples*non_pos_ratio)
@@ -71,7 +74,7 @@ def split_and_sample(
                         min_dis = dis
             df_labels_non.at[index,'x'] = new_point[0]
             df_labels_non.at[index,'y'] = new_point[1]
-            df_labels_non.at[index,'class'] = 4
+            df_labels_non.at[index,'class'] = len(classes)
     elif method=='uniform':
         df_labels_non = df_labels_samples.sample(n=n_samples*non_pos_ratio)
         for index, row in df_labels_non.iterrows():

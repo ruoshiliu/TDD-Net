@@ -11,7 +11,7 @@ import os
 
 def train_model(model, criterion, optimizer, scheduler, transform, train_num, test_num, non_pos_ratio, window_size, batch_size, device, classes, df_train_path, df_test_path, num_epochs, method, use_gpu = True):
     since = time.time()
-
+    
     best_model_wts = model.state_dict()
     best_acc = 0.0
 
@@ -25,11 +25,11 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
         running_loss = 0.0
         running_corrects = 0
 
-        trainset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_train_path, sep=" "), method = method, n_samples = train_num, non_pos_ratio = non_pos_ratio), window_size = window_size, transforms=transform)
+        trainset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_train_path, sep=" "), method = method, n_samples = train_num, non_pos_ratio = non_pos_ratio, classes = classes), window_size = window_size, transforms=transform)
         trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=16, drop_last=True)
         print("trainloader ready!")
 
-        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_test_path, sep=" "), method = method, n_samples = test_num), window_size = window_size, transforms=transform)
+        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_test_path, sep=" "), method = method, n_samples = test_num, classes = classes), window_size = window_size, transforms=transform)
         testloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=16)
         print("testloader ready!")
         # Iterate over data.
@@ -64,11 +64,12 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
             
             print('{} Loss: {:.4f} Acc: {:.4f} batch_loss: {:.4f} correct: {:d} batch_accuracy: {:.4f}'.format(
                 "train", epoch_loss, epoch_acc, iter_loss, correct, batch_accuracy))
-    
+        classes_test = classes.copy()
+        classes_test.append('non')
         correct = 0
         total = 0
-        class_correct = list(0. for i in range(5))
-        class_total = list(0. for i in range(5))
+        class_correct = list(0. for i in range(len(classes_test)))
+        class_total = list(0. for i in range(len(classes_test)))
         with torch.no_grad():
             model.train(False)
             for data in testloader:
@@ -85,8 +86,8 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
             print('Accuracy of the network on the test images: %.5f %%' % (100 * correct / total))
-            for i in range(5):
-                print('Accuracy of %5s : %2d %%' % (classes[i], 100 * class_correct[i] / class_total[i]))
+            for i in range(len(classes_test)):
+                print('Accuracy of %5s : %2d %%' % (classes_test[i], 100 * class_correct[i] / class_total[i]))
 
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(

@@ -12,17 +12,17 @@ from train import train_model
 
 window_size = 45
 pad_size = window_size
-classes = ["pos","neg","pos_o","nuc","non"]
+classes = ["pos","neg"] # classes has to match the 'classes' column in labels csv
 output_path = '/home/rliu/defect_classifier/models/python/resNext50_600epo_hard_01-10-18.model'
 batch_size = 256
 non_pos_ratio = 1
-train_num = 4000
-test_num = 1000
+train_num = 10000
+test_num = 2000
 mode = 'full' # or "tiny"
 method = 'hard'
 num_epochs = 600
-df_train_path = '/home/rliu/TDD-Net/csv_labels/112000train.csv'
-df_test_path = '/home/rliu/TDD-Net/csv_labels/112000test.csv'
+df_train_path = '/home/rliu/TDD-Net/csv_labels/112000train_pos_neg.csv'
+df_test_path = '/home/rliu/TDD-Net/csv_labels/112000test_pos_neg.csv'
 
 data_transform = transforms.Compose([
         transforms.RandomResizedCrop(200, scale=(1, 1), ratio=(1, 1)),
@@ -50,14 +50,18 @@ elif mode == "next":
 
 # change output channel for last fully connected layer according to number of classes
 num_ftrs = model.fc.in_features
-model.fc = nn.Linear(num_ftrs, len(classes)) 
+model.fc = nn.Linear(num_ftrs, len(classes)+1) # number of classes plus negative samples 
 
 if use_gpu:
     model = torch.nn.DataParallel(model)
     model.to(device)
 
 # adjust weights of negative samples during training
-weights = [1.0, 1.0, 1.0, 1.0, 1.0/non_pos_ratio]  
+weights = []
+for i in range(len(classes)):
+    weights.append(1.0)
+weights.append(1.0/non_pos_ratio)
+
 class_weights = torch.FloatTensor(weights).to(device)
 
 criterion = nn.NLLLoss(weight = class_weights)

@@ -9,7 +9,7 @@ from torchvision import datasets, models, transforms
 import time
 import os
 
-def train_model(model, criterion, optimizer, scheduler, transform, train_num, test_num, non_pos_ratio, window_size, batch_size, device, classes, df_train_path, df_test_path, num_epochs, method, use_gpu = True):
+def train_model(model, criterion, optimizer, scheduler, transform, train_num, test_num, non_pos_ratio, window_size, batch_size, device, classes, df_train_path, df_test_path, num_epochs, method, use_gpu = True, checkpoint_path = None):
     since = time.time()
     
     best_model_wts = model.state_dict()
@@ -29,7 +29,7 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
         trainloader = DataLoader(trainset, batch_size=batch_size, shuffle=True, num_workers=16, drop_last=True)
         print("trainloader ready!")
 
-        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_test_path, sep=" "), method = method, n_samples = test_num, classes = classes), window_size = window_size, transforms=transform)
+        testset = defectDataset_df(df = split_and_sample(df_labels = pd.read_csv(df_test_path, sep=" "), method = method, n_samples = test_num, classes = classes), window_size = window_size, transforms=None)
         testloader = DataLoader(testset, batch_size=batch_size, shuffle=False, num_workers=16)
         print("testloader ready!")
         # Iterate over data.
@@ -88,7 +88,11 @@ def train_model(model, criterion, optimizer, scheduler, transform, train_num, te
             print('Accuracy of the network on the test images: %.5f %%' % (100 * correct / total))
             for i in range(len(classes_test)):
                 print('Accuracy of %5s : %2d %%' % (classes_test[i], 100 * class_correct[i] / class_total[i]))
-
+        if checkpoint_path is not None:
+            if epoch % 10 == 0:
+                print('saving wiehgts...')
+                output_path = checkpoint_path + '%0.4d.weights' % epoch
+                torch.save(model, output_path)
     time_elapsed = time.time() - since
     print('Training complete in {:.0f}m {:.0f}s'.format(
         time_elapsed // 60, time_elapsed % 60))

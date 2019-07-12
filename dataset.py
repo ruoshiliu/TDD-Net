@@ -10,7 +10,7 @@ from util import create_circular_mask, sample_point_circular, split_and_sample, 
 
 
 class defectDataset_csv(Dataset):
-    def __init__(self, csv_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', img_path='/home/rliu/TDD-Net/data/', window_size=50, pad_size=50, mask = create_circular_mask(200,200), transforms=None):
+    def __init__(self, csv_path='/home/rliu/yolo2/v2_pytorch_yolo2/data/an_data/VOCdevkit/VOC2007/csv_labels/train.csv', img_path='/home/rliu/TDD-Net/data/', window_size=50, pad_size=50, mask = create_circular_mask(224,224), transforms=None):
         """
         Args:
             csv_path (string): path to csv file
@@ -39,7 +39,7 @@ class defectDataset_csv(Dataset):
         xmax = width * x + self.window_size/2 + self.pad_size
         ymax = height * y + self.window_size/2 + self.pad_size
         img_resized = img.crop((xmin, ymin, xmax, ymax))
-        img_resized = torchvision.transforms.functional.resize(img_resized, (200,200), interpolation=2)
+        img_resized = torchvision.transforms.functional.resize(img_resized, (224,224), interpolation=2)
         if self.transforms is not None:
             img_resized = self.transforms(img_resized)
         img_masked = img_resized * self.mask
@@ -53,7 +53,7 @@ class defectDataset_csv(Dataset):
         return len(self.data.index)
 
 class defectDataset_df(Dataset):
-    def __init__(self, df, img_path='/home/rliu/TDD-Net/data/', window_size=50, pad_size=50, mask = create_circular_mask(200,200), transforms=None):
+    def __init__(self, df, img_path='/home/rliu/TDD-Net/data/', window_size=50, pad_size=50, mask = create_circular_mask(224,224), transforms=None):
         """
         Args:
             df: dataframes of training data
@@ -81,7 +81,7 @@ class defectDataset_df(Dataset):
         xmax = width * x + self.window_size/2 + self.pad_size
         ymax = height * y + self.window_size/2 + self.pad_size
         img_resized = img.crop((xmin, ymin, xmax, ymax))
-        img_resized = torchvision.transforms.functional.resize(img_resized, (200,200), interpolation=2)
+        img_resized = torchvision.transforms.functional.resize(img_resized, (224,224), interpolation=2)
         if self.transforms is not None:
             img_resized = self.transforms(img_resized)
         img_masked = img_resized * self.mask
@@ -96,7 +96,7 @@ class defectDataset_df(Dataset):
         
 
 class defectDataset_convolution(Dataset):
-    def __init__(self, image_index = 6501, img_path='/home/rliu/TDD-Net/data/',window_size=45, mask = create_circular_mask(200,200), stride = 2, transforms=None):
+    def __init__(self, image_index = 6501, img_path='/home/rliu/TDD-Net/data/',window_size=45, mask = create_circular_mask(224,224), stride = 2, transforms=None):
         """
         Args:
             image_index: index of image being processed
@@ -116,7 +116,7 @@ class defectDataset_convolution(Dataset):
     def __getitem__(self, index):
         x,y = self.coords[index]
         img_resized = self.image.crop(box=(x - self.window_size/2,y - self.window_size/2, x + self.window_size/2, y + self.window_size/2))
-        img_resized = torchvision.transforms.functional.resize(img_resized, (200,200), interpolation=2)
+        img_resized = torchvision.transforms.functional.resize(img_resized, (224,224), interpolation=2)
         img_masked = img_resized * self.mask
         img_masked = Image.fromarray(img_masked.astype('uint8'), 'L')
         # Transform image to tensor

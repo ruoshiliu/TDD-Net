@@ -76,7 +76,7 @@ def split_and_sample(classes,
             df_labels_non.at[index,'y'] = new_point[1]
             df_labels_non.at[index,'class'] = len(classes)
     elif method=='uniform':
-        df_labels_non = df_labels_samples.sample(n=n_samples*non_pos_ratio)
+        df_labels_non = df_labels.sample(n=n_samples*non_pos_ratio)
         for index, row in df_labels_non.iterrows():
             min_dis = 0
             '''
@@ -105,7 +105,7 @@ def split_and_sample(classes,
                         min_dis = dis
             df_labels_non.at[index,'x'] = new_point[0]
             df_labels_non.at[index,'y'] = new_point[1]
-            df_labels_non.at[index,'class'] = 4
+            df_labels_non.at[index,'class'] = len(classes)
 
     elif method=='yolo':
         columns = ['image_index','class', 'x', 'y']

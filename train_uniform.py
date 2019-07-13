@@ -13,8 +13,8 @@ from train import train_model
 window_size = 45
 pad_size = window_size
 classes = ["pos","neg"] # classes has to match the 'classes' column in labels csv
-checkpoint_path = '/home/rliu/TDD-Net/models/python/res34-150epo_uniform_07-11-19/'
-output_path = '/home/rliu/TDD-Net/models/python/res34-150epo_uniform_07-11-19.model'
+checkpoint_path = '/home/rliu/TDD-Net/models/python/res34-150epo_uniform_07-12-19/'
+output_path = '/home/rliu/TDD-Net/models/python/res34-150epo_uniform_07-12-19.model'
 batch_size = 256
 non_pos_ratio = 6
 train_num = 5000
@@ -26,11 +26,11 @@ df_train_path = '/home/rliu/TDD-Net/csv_labels/train-2000.csv'
 df_test_path = '/home/rliu/TDD-Net/csv_labels/test-2000.csv'
 
 data_transform = transforms.Compose([
-        transforms.RandomRotation((-90,90)),
+#         transforms.RandomRotation((-90,90)),
         torchvision.transforms.RandomVerticalFlip(p=0.5),
         torchvision.transforms.RandomHorizontalFlip(p=0.5),
-        torchvision.transforms.RandomAffine(180, shear = 20),
-        torchvision.transforms.RandomPerspective(distortion_scale=0.1, p=0.1, interpolation=3),
+#         torchvision.transforms.RandomAffine(180, shear = 20),
+#         torchvision.transforms.RandomPerspective(distortion_scale=0.1, p=0.1, interpolation=3),
         torchvision.transforms.ColorJitter(brightness=0.5, contrast=0.5, saturation=0, hue=0)])
 
 use_gpu = torch.cuda.is_available()

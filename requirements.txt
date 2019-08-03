@@ -1,0 +1,10 @@
+#
+###### Requirements for TDD-Net ######
+###### Updated: 2019-8-03       ######
+#
+
+torch
+torchvision
+pandas
+numpy
+pillow

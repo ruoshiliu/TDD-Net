@@ -3,8 +3,8 @@
 ###### Updated: 2019-8-03       ######
 #
 
-torch
-torchvision
+torch == 1.0.0
+torchvision == 0.2.1
 pandas
 numpy
 pillow
